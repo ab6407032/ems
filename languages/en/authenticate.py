@@ -1,0 +1,5 @@
+SUCCESS_MSG = "Successfully Logged In."
+INCORRECT_PASSD = "Incorrect Password."
+USER_NOT_FOUND = "User not found"
+NOT_AUTHORIZED = "Not Authorized."
+LOGGED_OUT = "Sucessfully logged out"

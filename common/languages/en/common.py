@@ -1,0 +1,5 @@
+SERIALIZER_CLASS_ERR = "serializer_classes should be a dict mapping."
+CREATE_NOT_AUTHORIZED = "Create function is not offered in this path."
+UPDATE_NOT_AUTHORIZED = "Update function is not offered in this path."
+PARTIAL_UPDATE_NOT_AUTHORIZED = "Update function is not offered in this path."
+DESTROY_NOT_AUTHORIZED = "Delete function is not offered in this path."

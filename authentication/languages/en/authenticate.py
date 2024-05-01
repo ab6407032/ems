@@ -1,0 +1,11 @@
+SUCCESS_MSG = "Successfully Logged In."
+INCORRECT_PIN = "Incorrect Pin."
+USER_NOT_FOUND = "User not found. Please ‘Sign up’ if you are a new user."
+USER_EXISTS = "User already exists."
+NOT_AUTHORIZED = "Not Authorized."
+LOGGED_OUT = "Sucessfully logged out"
+NOT_REGISTERED = 'User not found. Please ‘Sign up’ if you are a new user.'
+PASSWORD_CHANGE_SUCCESS = "Login pin updated."
+REGISTRATION_SUCCESS = "Thank you. Our team will reach out to you soon."
+BAD_DATA = "Email not provided!"
+INVALID_TOKEN = "Invalid Google Token"
