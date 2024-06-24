@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'user.apps.UserConfig',
     'hardware.apps.HardwareConfig',
-    'monitor.apps.MonitorConfig'
+    'monitor.apps.MonitorConfig',
+    'master.apps.MasterConfig',
 ]
 
 MIDDLEWARE = [
@@ -215,3 +216,6 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = env('EMAIL_PORT')
 EMAIL_USE_TLS = env('EMAIL_USE_TLS')
+
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 200000 
