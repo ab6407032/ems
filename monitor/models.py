@@ -2,21 +2,36 @@ from django.db import models
 from django.utils import timezone
 from common.models import BaseModel
 from master.models import Keyword, Counter
+import os
+from helpers import extract_details
+from datetime import datetime, time
 
+def upload_to_original_filename(instance, filename):
+    return os.path.join('uploads/', filename)
 
-# class Status:
-#     DEFAULT = 0
-#     SUCCESS = 1
-#     INFO = 2
-#     WARNING = 3
-#     DANGER = 4
-#     STATUS_CHOICES = (
-#         (DEFAULT, "secondary"),
-#         (SUCCESS, "positive"),
-#         (INFO, "primary"),
-#         (WARNING, "warning"),
-#         (DANGER, "negative"),
-#     )
+METRIC_CHOICES = (
+        ("iub_throughput_utilization", "IUB throughput utilization"),
+        ("voice_traffic", "Voice Traffic"),
+        ("nas_success_rate_cs", "NAS success rate cs"),
+        ("rrc_success_rate_cs", "RRC success rate cs"),
+        ("rrc_success_rate_ps", "RRC success rate ps"),
+        ("hs_drop", "HS drop"),
+        ("csfb_success_rate", "CSFB success rate"),
+    )
+class Status:
+    DEFAULT = 0
+    SUCCESS = 1
+    INFO = 2
+    WARNING = 3
+    DANGER = 4
+    STATUS_CHOICES = (
+        (DEFAULT, "secondary"),
+        (SUCCESS, "positive"),
+        (INFO, "primary"),
+        (WARNING, "warning"),
+        (DANGER, "negative"),
+    )
+    
 
 
 # class Host(models.Model):
@@ -114,16 +129,30 @@ from master.models import Keyword, Counter
 #     def __str__(self):
 #         return self.port.number
 
-class RouterLogFile(BaseModel):
-    file = models.FileField(upload_to='uploads/')
-    name = models.CharField(max_length=255, null=True, blank=True, default='')
+class Node(BaseModel):
+    node_name = models.CharField(max_length=100)
+    active =  models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.node_name}"
+
+    class Meta:
+        verbose_name = "Node"
+        verbose_name_plural = "Nodes"
+
+class NodeLogFile(BaseModel):
+    node = models.ForeignKey(Node, null=True, blank=True, default='', on_delete=models.CASCADE)
+    file = models.FileField(upload_to=upload_to_original_filename)
+    name = models.TextField(null=True, blank=True, default='')
     upload_date = models.DateTimeField(auto_now_add=True)
     size = models.PositiveIntegerField()  # Store the size in bytes
     processed = models.BooleanField(default=False)
     metric_calculation = models.BooleanField(default=False)
-    traffic_voice_2g = models.FloatField(null=True, blank=True)
-    tchdrop = models.FloatField(null=True, blank=True)
-    sdcch_drop = models.FloatField(null=True, blank=True)
+    start_time = models.DateTimeField(null=True, blank=True, default=None)
+    end_time = models.DateTimeField(null=True, blank=True, default=None)
+
+    class Meta:
+        unique_together = ('node', 'file')
 
     def __str__(self):
         return self.name
@@ -134,28 +163,16 @@ class RouterLogFile(BaseModel):
         self.name = self.file.name
         super().save(*args, **kwargs)
 
-class RouterLogScore(BaseModel):
-    logfile = models.OneToOneField(RouterLogFile, null=True, blank=True, default='', on_delete=models.CASCADE)
-    traffic_voice_2g = models.FloatField(null=True, blank=True)
-    tchdrop = models.FloatField(null=True, blank=True)
-    sdcch_drop = models.FloatField(null=True, blank=True)
-
-    def __str__(self):
-        return self.logfile.name
-
-class RouterLog(BaseModel):
-    timestamp = models.DateTimeField(null=True, blank=True, default='')
-    logfile = models.ForeignKey(RouterLogFile, null=True, blank=True, default='', on_delete=models.CASCADE)
-    keyword = models.CharField(max_length=30, verbose_name="Keyword")
-    keyword_no = models.CharField(max_length=50, verbose_name="Keyword No")
-    counter_no = models.CharField(max_length=50, verbose_name="Counter No")
-    counter_name = models.CharField(max_length=50, verbose_name="Counter Name")
-    counter_value = models.IntegerField()
+class NodeMetric(BaseModel):
+    node = models.ForeignKey(Node, null=True, blank=True, default='', on_delete=models.CASCADE)
+    logfile = models.ForeignKey(NodeLogFile, null=True, blank=True, default='', on_delete=models.CASCADE)
+    metric = models.CharField(max_length = 255, choices=METRIC_CHOICES, default='', null=True, blank=True, )
+    value = models.FloatField(null=True, blank=True)
 
     class Meta:
-        verbose_name = "Router Log"
-        verbose_name_plural = "Router Logs"
+        unique_together = ('node', 'logfile', 'metric')
 
-    # def __str__(self):
-    #     return self.timestamp + "-" + self.keyword.code + "-" +  self.counter_name
+    def __str__(self):
+        return f"{self.node.node_name} {self.logfile.name}"
+
     

@@ -1,9 +1,16 @@
 from django.contrib import admin
 #from .models import Host, Port, Fiber, Dio, RouterLog
-from .models import RouterLog, RouterLogFile, RouterLogScore
+from .models import Node, NodeLogFile, NodeMetric
 from helpers import load_file_contents_db
 from django.urls import path
 from django.http import HttpResponseRedirect
+
+
+@admin.register(Node)
+class NodeAdmin(admin.ModelAdmin):
+    list_display = ('node_name', 'active')
+    search_fields = ('node_name',)
+    exclude = ('created_by', 'modified_by',)
 
 # class AbstractModelAdmin(admin.ModelAdmin):
 #     """Classe to dont repeat same fields to all"""
@@ -89,80 +96,76 @@ from django.http import HttpResponseRedirect
 
 #     def ip_(self, obj):
 #         return obj.host.ipv4
-class RouterLogScoreInline(admin.StackedInline):
-    model = RouterLogScore
-    can_delete = False
-    fk_name = 'logfile'
+# class RouterLogScoreInline(admin.StackedInline):
+#     model = RouterLogScore
+#     can_delete = False
+#     fk_name = 'logfile'
 
-class RouterLogFileAdmin(admin.ModelAdmin):
-    inlines = (RouterLogScoreInline, )
-    list_filter = ('upload_date', 'processed', 'metric_calculation',)
+class NodeLogFileAdmin(admin.ModelAdmin):
+    # inlines = (RouterLogScoreInline, )
+    list_filter = ('node', 'start_time', 'processed', 'metric_calculation',)
     list_display = (
         'pkid',
+        'node',
         'file',
         'name',
-        'upload_date',
+        'start_time',
         'size',
-        'traffic_voice_2g',
-        'tchdrop',
-        'sdcch_drop',
         'processed',
         'metric_calculation'
     )
-    search_fields = ('name', 'size', 'upload_date',)
+    search_fields = ('node__node_name', 'name', 'size', 'start_time',)
     # list_display_links = ('dummy',)
     # list_editable = ('name', 'code', 'active', )
     exclude = ('created_by', 'modified_by',)
     readonly_fields = ('pkid',)
     fieldsets = (("", {'fields': ((
         'file',
+        'node',
     )),
     'description': ''})),
 
-admin.site.register(RouterLogFile, RouterLogFileAdmin)
+admin.site.register(NodeLogFile, NodeLogFileAdmin)
 
-def load_data(modeladmin, request, queryset):
-    data = load_file_contents_db()
-    RouterLog.objects.bulk_create(data)
-    modeladmin.message_user(request, "Data Load executed successfully")
+# def load_data(modeladmin, request, queryset):
+#     data = load_file_contents_db()
+#     RouterLog.objects.bulk_create(data)
+#     modeladmin.message_user(request, "Data Load executed successfully")
 
-load_data.short_description = "Load Data"
+# load_data.short_description = "Load Data"
     
-class RouterAdmin(admin.ModelAdmin):
-    actions = [load_data]
-    list_filter = ('timestamp', 'logfile', 'keyword', 'counter_name',)
+class NodeMetricAdmin(admin.ModelAdmin):
+    # actions = [load_data]
+    list_filter = ('node', 'logfile', 'metric',)
     list_display = (
+        "node",
         "logfile",
-        "timestamp",
-        "keyword_no",
-        "keyword",
-        "counter_no",
-        "counter_name",
-        "counter_value"
+        "metric",
+        "value",
     )
-    search_fields = ["timestamp", "logfile__name", "keyword", "counter_name", "counter_value"]
-    ordering = ("-timestamp",)
+    search_fields = ["node__node_name", "logfile__name", "keyword", "metric"]
+    ordering = ("-created_on",)
     #list_editable = ('timestamp', 'keyword', 'keyword_no', 'counter', 'counter_no', 'counter_value')
     exclude = ('created_by', 'modified_by',)
     readonly_fields = ('pkid',)
-    fieldsets = (("", {'fields': (('timestamp', 'keyword', 'keyword_no', 'counter_name', 'counter_no', 'counter_value')),
+    fieldsets = (("", {'fields': (('node', 'logfile', 'metric', 'value')),
                        'description': ''})),
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path('load-data/', self.admin_site.admin_view(self.load_data), name='load_data'),
-        ]
-        return custom_urls + urls
+    # def get_urls(self):
+    #     urls = super().get_urls()
+    #     custom_urls = [
+    #         path('load-data/', self.admin_site.admin_view(self.load_data), name='load_data'),
+    #     ]
+    #     return custom_urls + urls
 
-    def load_data(self, request):
-        # Logic for the custom action
-        # Redirect or render a response
-        self.message_user(request, "Load Data executed successfully")
-        return HttpResponseRedirect("../")
+    # def load_data(self, request):
+    #     # Logic for the custom action
+    #     # Redirect or render a response
+    #     self.message_user(request, "Load Data executed successfully")
+    #     return HttpResponseRedirect("../")
 
 
 # admin.site.register(Host, HostAdmin)
 # admin.site.register(Dio, DioAdmin)
 # admin.site.register(Fiber, FibraAdmin)
 # admin.site.register(Port, PortAdmin)
-admin.site.register(RouterLog, RouterAdmin)
+admin.site.register(NodeMetric, NodeMetricAdmin)

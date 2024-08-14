@@ -1,8 +1,7 @@
-"""
-URL configuration for ems project.
+"""ispace URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.0/topics/http/urls/
+    https://docs.djangoproject.com/en/2.2/topics/http/urls/
 Examples:
 Function views
     1. Add an import:  from my_app import views
@@ -15,8 +14,28 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path, include
+# from authentication.urls import router_auth
+from monitor.urls import router_monitor
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # re_path('admin/api/(?P<version>(v1|v2))/', include(router_master.urls)),
+    # re_path('admin/api/(?P<version>(v1|v2))/', include(router_users.urls)),
+    # re_path('admin/api/(?P<version>(v1|v2))/', include(router_projects.urls)),
+    # re_path('admin/api/(?P<version>(v1|v2))/', include(router_sub.urls)),
+    # re_path('admin/api/(?P<version>(v1|v2))/', include(router_bid.urls)),
+    # re_path('admin/api/(?P<version>(v1|v2))/', include(router_trn.urls)),
+    # re_path('admin/api/(?P<version>(v1|v2))/', include(router_cms.urls)),
+    # re_path('admin/api/(?P<version>(v1|v2))/', include('dashboard.urls')),
+
+    # re_path('api/(?P<version>(v1|v2))/', include(router_auth.urls)),
+    re_path('api/(?P<version>(v1|v2))/', include(router_monitor.urls)),
+    # re_path('api/(?P<version>(v1|v2))/', include(router_common.urls)),
+    # re_path('api/(?P<version>(v1|v2))/', include(router_frontend.urls)),
+
+    # re_path('api/(?P<version>(v1|v2))/', include('frontend.urls')),
+
+    # re_path('api/(?P<version>(v1|v2))/parseExcel', ParseExcel.as_view()),
 ]
+
