@@ -19,7 +19,7 @@ from rest_framework.parsers import (MultiPartParser, JSONParser)
 class NodeMonitorViewset(UUIDAltModelViewSet):
     queryset = Node.objects.all().filter(active=True)
     authentication_classes = [SessionAuthentication, BasicAuthentication, JWTAuthentication, ]
-    permission_classes = []
+    permission_classes = [IsAuthenticated, ]
     serializer_class = EmptySerializer
     pagination_class = CustomPagination
     filter_backends = (DynamicSearchFilter,)
@@ -29,5 +29,25 @@ class NodeMonitorViewset(UUIDAltModelViewSet):
         'list': NodeSerializer,
         'retrieve': NodeSerializer
     }
+
+    search_parameters = (
+        'node_name', 'user__id', 'user__email'
+    )
+
+    def get_object(self, id):
+        try:
+            return Node.objects.filter(id=id).filter(user=self.request.user).first()
+        except Node.DoesNotExist:
+            return None
+
+    def get_queryset(self):
+        """ allow rest api to filter by submissions """
+        queryset = Node.objects.filter(user=self.request.user).order_by('-created_on')
+        return queryset
+
+    def retrieve(self, request, version, id=None):
+        node = self.get_object(id)
+        serializer = self.get_serializer(node, context={'request': request})
+        return Response(serializer.data)
 
     

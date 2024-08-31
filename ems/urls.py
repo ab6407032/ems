@@ -14,8 +14,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.urls import path, include, re_path
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path, re_path, include
-# from authentication.urls import router_auth
+from authentication.urls import router_auth
 from monitor.urls import router_monitor
 
 urlpatterns = [
@@ -29,7 +32,7 @@ urlpatterns = [
     # re_path('admin/api/(?P<version>(v1|v2))/', include(router_cms.urls)),
     # re_path('admin/api/(?P<version>(v1|v2))/', include('dashboard.urls')),
 
-    # re_path('api/(?P<version>(v1|v2))/', include(router_auth.urls)),
+    re_path('api/(?P<version>(v1|v2))/', include(router_auth.urls)),
     re_path('api/(?P<version>(v1|v2))/', include(router_monitor.urls)),
     # re_path('api/(?P<version>(v1|v2))/', include(router_common.urls)),
     # re_path('api/(?P<version>(v1|v2))/', include(router_frontend.urls)),
@@ -37,5 +40,5 @@ urlpatterns = [
     # re_path('api/(?P<version>(v1|v2))/', include('frontend.urls')),
 
     # re_path('api/(?P<version>(v1|v2))/parseExcel', ParseExcel.as_view()),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

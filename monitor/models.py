@@ -5,6 +5,7 @@ from master.models import Keyword, Counter
 import os
 from helpers import extract_details
 from datetime import datetime, time
+from user.models import User
 
 def upload_to_original_filename(instance, filename):
     return os.path.join('uploads/', filename)
@@ -131,6 +132,7 @@ class Status:
 
 class Node(BaseModel):
     node_name = models.CharField(max_length=100)
+    user = models.ForeignKey(User, null=True, blank=True, default='', on_delete=models.CASCADE)
     active =  models.BooleanField(default=True)
 
     def __str__(self):

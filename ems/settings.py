@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     'hardware.apps.HardwareConfig',
     'monitor.apps.MonitorConfig',
     'master.apps.MasterConfig',
+    'authentication.apps.AuthenticationConfig',
+    'notification.apps.NotificationConfig'
 ]
 
 MIDDLEWARE = [
@@ -211,11 +213,42 @@ AUTHENTICATION_BACKENDS = (
     'guardian.backends.ObjectPermissionBackend',
 )
 
+TWILIO_ACCOUNT_SID = env('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = env('TWILIO_AUTH_TOKEN')
+TWILIO_FROM = env('TWILIO_FROM')
+TWILIO_MESSAGE_SERVICE_SID = env('TWILIO_MESSAGE_SERVICE_SID')
+
 EMAIL_HOST = env('EMAIL_HOST')
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = env('EMAIL_PORT')
 EMAIL_USE_TLS = env('EMAIL_USE_TLS')
 
+GOOGLE_AUTH_CLIENT_ID = env('GOOGLE_AUTH_CLIENT_ID')
 
-DATA_UPLOAD_MAX_NUMBER_FIELDS = 200000 
+# TINYMCE_JS_URL = 'http://debug.example.org/tiny_mce/tiny_mce_src.js'
+TINYMCE_DEFAULT_CONFIG = {
+    "apiKey": env('TINYMCE_API_KEY'),
+    "height": "300px",
+    "width": "450px",
+    "menubar": "file edit view insert format tools table help",
+    "plugins": "tiny_mce_wiris powerpaste advlist autolink lists link image media mediaembed  charmap print preview anchor searchreplace visualblocks code "
+    "fullscreen insertdatetime media table paste code help wordcount",
+    "toolbar": "tiny_mce_wiris_formulaEditor undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft "
+    "aligncenter alignright alignjustify | outdent indent |  numlist bullist checklist | forecolor "
+    "backcolor casechange permanentpen formatpainter removeformat | pagebreak | charmap emoticons | "
+    "fullscreen  preview save print | insertfile image media pageembed template link anchor codesample | "
+    "a11ycheck ltr rtl | showcomments addcomment code",
+    "custom_undo_redo_levels": 10,
+    "images_upload_url": "http://localhost:8000/admin/api/v1/question/upload_image/",
+    "external_plugins": {"tiny_mce_wiris": 'https://www.wiris.net/demo/plugins/tiny_mce/plugin.js'},
+    "relative_urls": False,
+    "remove_script_host": False,
+    "convert_urls": False,
+    # "language": "es_UN",  # To force a specific language instead of the Django current language.
+}
+TINYMCE_SPELLCHECKER = False
+TINYMCE_COMPRESSOR = False
+
+IMPORT_EXPORT_USE_TRANSACTIONS = True
+

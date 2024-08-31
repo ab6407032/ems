@@ -13,6 +13,9 @@ from authentication.serializers.authenticate import (
 from common.serializers import EmptySerializer
 from user.models import Profile
 from third_party.google import Google
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class AuthenticateViewset(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -24,9 +27,21 @@ class AuthenticateViewset(viewsets.ModelViewSet):
         'reset_password': ResetPassSerializer,
         'google_login': UserRegisterGoogleSerializer
     }
-    authentication_classes = []
+    authentication_classes = [SessionAuthentication, BasicAuthentication, JWTAuthentication, ]
     permission_classes = []
     lookup_field = 'email'
+
+    permission_classes = []  # Default to no authentication required
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action == 'logout':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [AllowAny]  # Allow access to all other actions
+        return [permission() for permission in permission_classes]
 
     def get_serializer_class(self):
         if not isinstance(self.serializer_classes, dict):
@@ -134,7 +149,7 @@ class AuthenticateViewset(viewsets.ModelViewSet):
 
     @action(methods=['POST', ], detail=False)
     def logout(self, request, version):
-        user = User.objects.get(email=request.user.email)        
+        user = User.objects.get(email=self.request.user.email)        
         user.is_logged_in = False
         user.save()
         request.session.flush()
